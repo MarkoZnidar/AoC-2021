@@ -139,12 +139,3 @@ for (int i = 0; i < gridSize; i++)
 Console.WriteLine($"Number of points where at least 2 lines overlap: {count}");
 
 
-
-
-
-
-
-
-
-
-
