@@ -1,10 +1,10 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-var input = File.ReadAllText(@"demo.txt")
-    .Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
-
-// var input = File.ReadAllText(@"input.txt")
+// var input = File.ReadAllText(@"demo.txt")
 //     .Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
+
+var input = File.ReadAllText(@"input.txt")
+    .Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries);
 
 var rows = input.Length;
 var cols = input[0].Length;
@@ -91,6 +91,7 @@ int[,] GeerateBasinMap(List<(int, int)> lowPointCoord)
         {
             var current = processCoordinates.First();
             processCoordinates.Remove(current);
+            
             row = current.Item1;
             column = current.Item2;
             
@@ -102,38 +103,25 @@ int[,] GeerateBasinMap(List<(int, int)> lowPointCoord)
             beenThere.Add((row,column));
             
             basinMap[row, column] = basinId;
-            
-            var leftIndex = column - 1;
-            var rightIndex = column + 1;
-            var upIndex = row - 1;
-            var downIndex = row + 1;
-            
-            if (leftIndex >= 0)
-            {
-                if(matrix[row, leftIndex] == 9)
-                    continue;
-                processCoordinates.Add((row, leftIndex));
-            }
 
-            if (rightIndex < matrix.GetLength(1))
-            {
-                if (matrix[row, rightIndex] == 9)
-                    continue;
-                processCoordinates.Add((row, rightIndex));
-            }
+            var directions = new List<(int, int)>() {(0, 1), (0, -1), (-1, 0), (1, 0)};
 
-            if (upIndex >= 0)
+            foreach (var direction in directions)
             {
-                if (matrix[upIndex, column] == 9)
-                    continue;
-                processCoordinates.Add((upIndex, column));
-            }
+                var newRow = row + direction.Item1;
+                var newColumn=  column + direction.Item2;
 
-            if (downIndex < matrix.GetLength(0))
-            {
-                if(matrix[downIndex, column] == 9)
+                if (!((0 <= newRow && newRow < rows) && (0 <= newColumn && newColumn < cols)))
+                {
                     continue;
-                processCoordinates.Add((downIndex, column));
+                }
+
+                if (matrix[newRow, newColumn] == 9)
+                {
+                    continue;
+                }
+                
+                processCoordinates.Add((newRow, newColumn));
             }
         }
 
@@ -142,6 +130,8 @@ int[,] GeerateBasinMap(List<(int, int)> lowPointCoord)
     
     return basinMap;
 }
+
+//Console.WriteLine($"Part 2: Low points coordinates: {string.Join(",",lowPointsCoordinates)}");
 
 var map = GeerateBasinMap(lowPointsCoordinates);
 
@@ -153,25 +143,14 @@ for(int i = 1; i<=lowPointsCoordinates.Count; i++)
 }
 
 Console.WriteLine("3 largest basins are:");
-
-var largest = basinIdAndSize.OrderByDescending(x => x.Value).Take(3).ToList();
+var largestThree = basinIdAndSize.OrderByDescending(x => x.Value).Take(3).ToList();
 
 var result = 1;
-foreach (var item in largest)
+foreach (var item in largestThree)
 {
     Console.WriteLine($"Basin ID:{item.Key} Size:{item.Value}");
     result *= item.Value;
 }
 
 Console.WriteLine($"Part 2: 3 largest basins multiplication result is: {result}");
-
-for (int i = 0; i < rows; i++)
-{
-    for (int j = 0; j < cols; j++)
-    {
-        Console.Write(map[i, j]);
-    }
-    Console.WriteLine();
-}
-
 
